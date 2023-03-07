@@ -3,12 +3,16 @@ require("dotenv").config();
 const { abi } = require("../artifacts/contracts/Greeter.sol/Greeter.json");
 const { MerkleTree } = require("merkletreejs");
 const SHA256 = require("crypto-js/sha256");
+const crypto = require("crypto");
 const Pedersen = require("simple-js-pedersen-commitment");
-const contractAddress = "0x4d5C259fb90900D96a5d863d516A3F7b0284Fe70";
+const contractAddress = "0x97eFacda5eaB882feBF9762df4dce1848390222f";
 const pederson = new Pedersen(
   "925f15d93a513b441a78826069b4580e3ee37fc5",
   "959144013c88c9782d5edd2d12f54885aa4ba687"
 );
+const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+  modulusLength: 2048,
+});
 const signer = new ethers.Wallet(
   "7238bcd2b5ec01dd347d3d0ff0a92633fc5ee1b6b12986fba8d2a89083f1f01b",
   providers.getDefaultProvider(
@@ -27,21 +31,48 @@ const transaction = async () => {
   console.log(a);
 };
 
-const merkleHash = () => {
+const merkleHash = (inputDoc) => {
   const leaves = inputDoc.map((x) => SHA256(x));
   const tree = new MerkleTree(leaves, SHA256);
   const root = tree.getRoot().toString("hex");
   const leaf = SHA256("1000");
   const proof = tree.getProof(leaf);
-  console.log(" Merkle tree : " + tree.verify(proof, leaf, root)); // true
-  perdersonCommit(root);
+  // console.log(" Merkle tree : " + tree.verify(proof, leaf, root)); // true
+  // perdersonCommit(root);
+  return root;
 };
 
 const perdersonCommit = (hash) => {
   const secret = pederson.newSecret();
   const commitment = pederson.commit(hash, secret);
   const result = pederson.verify(hash, [commitment], secret);
-  console.log("Pederson commit result : " + result);
+  console.log("Pederson commit  : " + commitment);
+  return commitment;
 };
-transaction();
-merkleHash();
+
+const user = (inputDoc) => {
+  const hashRoot = merkleHash(inputDoc);
+  const commitment = perdersonCommit(hashRoot);
+  return commitment;
+};
+
+const certifier = async (commitmentUser) => {
+  commitmentUser.forEach((c) => {
+    c = crypto.sign("SHA256", c, privateKey);
+  });
+  const a = await contract.callStatic.setCommitment(commitmentUser);
+  console.log(a);
+  const b = await contract.callStatic.getCommitment();
+  console.log(b);
+
+  // const hashRoot = merkleHash(inputDoc);
+  // const commitment = perdersonCommit(hashRoot);
+  // if (commitment === commitmentUser) {
+  //   console.log("commitment matched ");
+  // }
+};
+//transaction();
+//merkleHash(inputDoc);
+
+const commitmentUser = user(inputDoc);
+certifier(commitmentUser);

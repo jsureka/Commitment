@@ -7,6 +7,7 @@ contract Greeter {
   string private greeting;
   address private _owner;
   uint256 private requirement_balance = 1000;
+  string[] private commitment;
   modifier onlyOwner() {
     require(msg.sender == _owner, "Not an owner");
     _;
@@ -35,5 +36,13 @@ contract Greeter {
   function requirementFunction(uint256 value) public view returns (bool) {
     if (value > requirement_balance) return true;
     else return false;
+  }
+
+  function setCommitment(string[] memory user_commitment) public payable {
+    commitment = user_commitment;
+  }
+
+  function getCommitment() public view returns (string[] memory) {
+    return commitment;
   }
 }
