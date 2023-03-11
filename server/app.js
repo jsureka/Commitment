@@ -67,6 +67,7 @@ const certifier = async (commitmentUser) => {
 
   // const hashRoot = merkleHash(inputDoc);
   // const commitment = perdersonCommit(hashRoot);
+  // console.log(commitment);
   // if (commitment === commitmentUser) {
   // console.log("commitment matched ");
   // }
@@ -75,4 +76,5 @@ const certifier = async (commitmentUser) => {
 //merkleHash(inputDoc);
 
 const commitmentUser = user(inputDoc);
-certifier(commitmentUser);
+console.log(commitmentUser);
+// certifier(commitmentUser);

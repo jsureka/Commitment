@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import "hardhat/console.sol";
 
-contract Greeter {
+contract Req {
   string private greeting;
   address private _owner;
   uint256 private requirement_balance = 1000;
