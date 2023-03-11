@@ -35,10 +35,6 @@ const merkleHash = (inputDoc) => {
   const leaves = inputDoc.map((x) => SHA256(x));
   const tree = new MerkleTree(leaves, SHA256);
   const root = tree.getRoot().toString("hex");
-  const leaf = SHA256("1000");
-  const proof = tree.getProof(leaf);
-  console.log(" Merkle tree : " + tree.verify(proof, leaf, root)); // true
-  // perdersonCommit(root);
   return root;
 };
 
@@ -76,7 +72,19 @@ const certifier = async (commitmentUser) => {
 //transaction();
 //merkleHash(inputDoc);
 
+const generateProofMerkleTree = (inputDoc) => {
+  const leaves = inputDoc.map((x) => SHA256(x));
+  const tree = new MerkleTree(leaves, SHA256);
+  const root = tree.getRoot().toString("hex");
+  const leaf = SHA256("1000");
+  const proof = tree.getProof(leaf);
+  const isVerified = tree.verify(proof, leaf, root);
+  // perdersonCommit(root);
+  return isVerified;
+};
+
 const commitmentUser = user(inputDoc);
 // console.log("Commitment:");
 // console.log(commitmentUser);
+console.log(generateProofMerkleTree(inputDoc));
 certifier(commitmentUser);
