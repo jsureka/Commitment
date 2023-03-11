@@ -1,6 +1,6 @@
 const { ethers, providers } = require("ethers");
 require("dotenv").config();
-const { abi } = require("../artifacts/contracts/Greeter.sol/Greeter.json");
+const { abi } = require("../artifacts/contracts/Req.sol/Req.json");
 const { MerkleTree } = require("merkletreejs");
 const SHA256 = require("crypto-js/sha256");
 const crypto = require("crypto");
@@ -60,8 +60,9 @@ const certifier = async (commitmentUser) => {
   commitmentUser.forEach((c) => {
     c = crypto.sign("SHA256", c, privateKey);
   });
-  const a = await contract.callStatic.setCommitment(commitmentUser);
-  console.log(a);
+  const tx = await contract.setCommitment(commitmentUser);
+  const receipt = await tx.wait();
+  console.log(receipt);
   const b = await contract.callStatic.getCommitment();
   console.log(b);
 
@@ -76,5 +77,7 @@ const certifier = async (commitmentUser) => {
 //merkleHash(inputDoc);
 
 const commitmentUser = user(inputDoc);
-console.log(commitmentUser);
-// certifier(commitmentUser);
+// console.log("Commitment:");
+// console.log(commitmentUser);
+certifier(commitmentUser);
+
