@@ -5,7 +5,7 @@ const { MerkleTree } = require("merkletreejs");
 const SHA256 = require("crypto-js/sha256");
 const crypto = require("crypto");
 const Pedersen = require("simple-js-pedersen-commitment");
-const contractAddress = "0xbFbF928777811aBAC401CE858A92c3432C65b2f3";
+const contractAddress = "0x42D9A54221aDAf22d01629F3D5f1E203cC124149";
 const pederson = new Pedersen(
   "925f15d93a513b441a78826069b4580e3ee37fc5",
   "959144013c88c9782d5edd2d12f54885aa4ba687"
@@ -37,7 +37,7 @@ const merkleHash = (inputDoc) => {
   const root = tree.getRoot().toString("hex");
   const leaf = SHA256("1000");
   const proof = tree.getProof(leaf);
-  // console.log(" Merkle tree : " + tree.verify(proof, leaf, root)); // true
+  console.log(" Merkle tree : " + tree.verify(proof, leaf, root)); // true
   // perdersonCommit(root);
   return root;
 };
@@ -80,4 +80,3 @@ const commitmentUser = user(inputDoc);
 // console.log("Commitment:");
 // console.log(commitmentUser);
 certifier(commitmentUser);
-
