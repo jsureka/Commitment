@@ -12,10 +12,6 @@ const check = function(hashCheck) {
 
     const check3 = (v * h)
     const check4 = (r * h) + c * (x * h)
-    console.log(check1);
-    console.log(check2);
-    console.log(check3);
-    console.log(check4);
 }
 
 smallerParts.forEach(hashPart => check(hashPart))

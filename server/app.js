@@ -22,14 +22,15 @@ const signer = new ethers.Wallet(
 
 const contract = new ethers.Contract(contractAddress, abi, signer);
 const inputDoc = ["Balance", "of", "X", "is", "1000"];
-const from = "0x66fe4806cD41BcD308c9d2f6815AEf6b2e38f9a3";
-const to = "0xC41672E349C3F6dAdf8e4031b6D2d3d09De276f9";
-const tokenId = 100;
 
 const transaction = async () => {
   const a = await contract.callStatic.requirementFunction(8000);
   console.log(a);
 };
+let g = 8,
+  h = 4,
+  v = 6,
+  x = 0xffffff;
 
 const merkleHash = (inputDoc) => {
   const leaves = inputDoc.map((x) => SHA256(x));
@@ -61,17 +62,9 @@ const certifier = async (commitmentUser) => {
   console.log(receipt);
   const b = await contract.callStatic.getCommitment();
   console.log(b);
-
-  // const hashRoot = merkleHash(inputDoc);
-  // const commitment = perdersonCommit(hashRoot);
-  // console.log(commitment);
-  // if (commitment === commitmentUser) {
-  // console.log("commitment matched ");
-  // }
 };
-//transaction();
-//merkleHash(inputDoc);
 
+//Check Proof
 const generateProofMerkleTree = (inputDoc) => {
   const leaves = inputDoc.map((x) => SHA256(x));
   const tree = new MerkleTree(leaves, SHA256);
@@ -83,8 +76,37 @@ const generateProofMerkleTree = (inputDoc) => {
   return isVerified;
 };
 
-const commitmentUser = user(inputDoc);
+const check = function (hashCheck) {
+  x = hashCheck;
+  const c = h * ((x * g) | (x * h) | (v * g) | (v * h));
+  const r = v - x * c;
+
+  const check1 = v * g;
+  const check2 = r * g + c * (x * g);
+
+  const check3 = v * h;
+  const check4 = r * h + c * (x * h);
+  if (check1 == check2 && check3 == check4) return true;
+  else return false;
+};
+
+const zeroKnowledgeProof = (hash) => {
+  let isCheck = true;
+  const smallerParts = hash.match(/.{1,6}/g).map((e) => Number("0x" + e));
+  smallerParts.forEach((hashPart) => {
+    if (!check(hashPart)) {
+      isCheck = false;
+      return;
+    }
+  });
+  if (isCheck) return true;
+  else return false;
+};
+
+//const commitmentUser = user(inputDoc);
 // console.log("Commitment:");
 // console.log(commitmentUser);
-console.log(generateProofMerkleTree(inputDoc));
-certifier(commitmentUser);
+//console.log(generateProofMerkleTree(inputDoc));
+//certifier(commitmentUser);
+const result = zeroKnowledgeProof(merkleHash(inputDoc));
+console.log(result);
