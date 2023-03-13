@@ -68,21 +68,23 @@ const merkleHash = (inputDoc) => {
   return root;
 };
 const h = merkleHash(inputDoc);
-const xG = bitwiseAND(h, shared_G);
-const xH = bitwiseAND(h, shared_H);
 
-const v = CryptoJS.SHA256("Secret value").toString(CryptoJS.enc.Hex);
-const vG = bitwiseAND(v, shared_G);
-const vH = bitwiseAND(v, shared_H);
+console.log(h);
+// const xG = bitwiseAND(h, shared_G);
+// const xH = bitwiseAND(h, shared_H);
 
-const c = bitwiseAND(shared_H, bitwiseOR(vH, bitwiseOR(vG, bitwiseOR(xG, xH))));
+// const v = CryptoJS.SHA256("Secret value").toString(CryptoJS.enc.Hex);
+// const vG = bitwiseAND(v, shared_G);
+// const vH = bitwiseAND(v, shared_H);
 
-const r = subtract(v, bitwiseAND(h, c));
+// const c = bitwiseAND(shared_H, bitwiseOR(vH, bitwiseOR(vG, bitwiseOR(xG, xH))));
+
+// const r = subtract(v, bitwiseAND(h, c));
 
 //Check proof
 
-const rG = bitwiseAND(r, shared_G);
-const check_vG = add(rG, bitwiseAND(c, xG));
+// const rG = bitwiseAND(r, shared_G);
+// const check_vG = add(rG, bitwiseAND(c, xG));
 
-console.log(vG);
-console.log(check_vG);
+// console.log(vG);
+// console.log(check_vG);
