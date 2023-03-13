@@ -27,8 +27,8 @@ const transaction = async () => {
   const a = await contract.callStatic.requirementFunction(8000);
   console.log(a);
 };
-let g = 8,
-  h = 4,
+let g = crypto.randomInt(1000),
+  h = crypto.randomInt(1000),
   v = 6,
   x = 0xffffff;
 
@@ -92,7 +92,7 @@ const check = function (hashCheck) {
 
 const zeroKnowledgeProof = (hash) => {
   let isCheck = true;
-  const smallerParts = hash.match(/.{1,6}/g).map((e) => Number("0x" + e));
+  const smallerParts = hash.match(/.{1,2}/g).map((e) => Number("0x" + e));
   smallerParts.forEach((hashPart) => {
     if (!check(hashPart)) {
       isCheck = false;
