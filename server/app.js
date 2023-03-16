@@ -5,6 +5,8 @@ const { MerkleTree } = require("merkletreejs");
 const SHA256 = require("crypto-js/sha256");
 const crypto = require("crypto");
 const Pedersen = require("simple-js-pedersen-commitment");
+
+let hrstart = process.hrtime();
 const contractAddress = "0x42D9A54221aDAf22d01629F3D5f1E203cC124149";
 const pederson = new Pedersen(
   "925f15d93a513b441a78826069b4580e3ee37fc5",
@@ -19,12 +21,13 @@ const signer = new ethers.Wallet(
     "https://eth-goerli.g.alchemy.com/v2/1fypRVHc0bJNqGLM1YcDnwyXmk8M15y8"
   )
 );
+const secret = pederson.newSecret();
 
 const contract = new ethers.Contract(contractAddress, abi, signer);
 const inputDoc = ["Balance", "of", "X", "is", "1000"];
 
 const transaction = async () => {
-  const a = await contract.callStatic.requirementFunction(8000);
+  const a = await contract.callStatic.requirementFunction(1000);
   console.log(a);
 };
 let g = crypto.randomInt(1000),
@@ -40,7 +43,6 @@ const merkleHash = (inputDoc) => {
 };
 
 const perdersonCommit = (hash) => {
-  const secret = pederson.newSecret();
   const commitment = pederson.commit(hash, secret);
   const result = pederson.verify(hash, [commitment], secret);
   console.log("Pederson commit  : " + commitment);
@@ -54,14 +56,24 @@ const user = (inputDoc) => {
 };
 
 const certifier = async (commitmentUser) => {
-  commitmentUser.forEach((c) => {
-    c = crypto.sign("SHA256", c, privateKey);
-  });
-  const tx = await contract.setCommitment(commitmentUser);
-  const receipt = await tx.wait();
-  console.log(receipt);
-  const b = await contract.callStatic.getCommitment();
-  console.log(b);
+  console.log("Before signing......");
+  console.log(commitmentUser);
+
+  commitmentUser = commitmentUser.map((c) =>
+    crypto.privateEncrypt(privateKey, Buffer.from(c, "utf8")).toString("base64")
+  );
+  console.log("After signing......");
+  console.log(commitmentUser);
+
+  commitmentUser = commitmentUser.map((c) =>
+    crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
+  );
+
+  console.log("After decrypting......");
+  console.log(commitmentUser);
+  // const tx = await contract.setCommitment(commitmentUser);
+  // const receipt = await tx.wait();
+  // console.log(receipt);
 };
 
 //Check Proof
@@ -69,6 +81,8 @@ const generateProofMerkleTree = (inputDoc) => {
   const leaves = inputDoc.map((x) => SHA256(x));
   const tree = new MerkleTree(leaves, SHA256);
   const root = tree.getRoot().toString("hex");
+  const commitment = pederson.commit(root, secret);
+
   const leaf = SHA256("1000");
   const proof = tree.getProof(leaf);
   const isVerified = tree.verify(proof, leaf, root);
@@ -93,28 +107,29 @@ const check = function (hashCheck) {
 const zeroKnowledgeProof = (hash) => {
   let isCheck = true;
   const smallerParts = hash.match(/.{1,2}/g).map((e) => Number("0x" + e));
-  smallerParts.forEach((hashPart) => {
-    // console.log(hashPart);
-    console.log(check(hashPart));
+  for (let index = 0; index < smallerParts.length; index++) {
+    const hashPart = smallerParts[index];
     if (!check(hashPart)) {
       isCheck = false;
-      return;
+      break;
     }
-  });
-  if (isCheck) return true;
-  else return false;
+  }
+  return isCheck;
 };
 
-var hrstart = process.hrtime()
+async function main(params) {
+  const commitmentUser = user(inputDoc);
+  console.log("Commitment:");
+  await certifier(commitmentUser);
+  // await transaction();
 
-const commitmentUser = user(inputDoc);
-console.log("Commitment:");
-// console.log(commitmentUser);
-console.log(generateProofMerkleTree(inputDoc));
-certifier(commitmentUser);
-const result = zeroKnowledgeProof(merkleHash(inputDoc));
-console.log(result);
+  // const result = zeroKnowledgeProof(merkleHash(inputDoc));
+  // console.log(generateProofMerkleTree(inputDoc));
+  // console.log(result);
 
-hrend = process.hrtime(hrstart)
+  // hrend = process.hrtime(hrstart)
 
-console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+  // console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+}
+
+main();
