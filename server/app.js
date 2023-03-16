@@ -8,13 +8,14 @@ const Pedersen = require("simple-js-pedersen-commitment");
 
 let hrstart = process.hrtime();
 const contractAddress = "0x42D9A54221aDAf22d01629F3D5f1E203cC124149";
-const pederson = new Pedersen(
+let pederson = new Pedersen(
   "925f15d93a513b441a78826069b4580e3ee37fc5",
   "959144013c88c9782d5edd2d12f54885aa4ba687"
 );
 const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
   modulusLength: 2048,
 });
+
 const signer = new ethers.Wallet(
   "7238bcd2b5ec01dd347d3d0ff0a92633fc5ee1b6b12986fba8d2a89083f1f01b",
   providers.getDefaultProvider(
@@ -22,6 +23,7 @@ const signer = new ethers.Wallet(
   )
 );
 const secret = pederson.newSecret();
+
 
 const contract = new ethers.Contract(contractAddress, abi, signer);
 const inputDoc = ["Balance", "of", "X", "is", "1000"];
@@ -43,9 +45,17 @@ const merkleHash = (inputDoc) => {
 };
 
 const perdersonCommit = (hash) => {
+  console.log("Hash......");
+  console.log(hash);
+  console.log(secret);
+
   const commitment = pederson.commit(hash, secret);
+
+ 
   const result = pederson.verify(hash, [commitment], secret);
-  console.log("Pederson commit  : " + commitment);
+  console.log("Result........");
+  console.log(result);
+
   return commitment;
 };
 
@@ -62,32 +72,52 @@ const certifier = async (commitmentUser) => {
   commitmentUser = commitmentUser.map((c) =>
     crypto.privateEncrypt(privateKey, Buffer.from(c, "utf8")).toString("base64")
   );
+
   console.log("After signing......");
   console.log(commitmentUser);
 
-  commitmentUser = commitmentUser.map((c) =>
-    crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
-  );
+  // commitmentUser = commitmentUser.map((c) =>
+  //   crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
+  // );
 
-  console.log("After decrypting......");
-  console.log(commitmentUser);
-  // const tx = await contract.setCommitment(commitmentUser);
-  // const receipt = await tx.wait();
+  // console.log("After decrypting......");
+  // console.log(commitmentUser);
+  const tx = await contract.setCommitment(commitmentUser);
+  const receipt = await tx.wait();
   // console.log(receipt);
+  console.log("receipt done...");
 };
 
 //Check Proof
-const generateProofMerkleTree = (inputDoc) => {
+const generateProofMerkleTree = async (inputDoc) => {
   const leaves = inputDoc.map((x) => SHA256(x));
   const tree = new MerkleTree(leaves, SHA256);
   const root = tree.getRoot().toString("hex");
-  const commitment = pederson.commit(root, secret);
+  console.log("Root......");
+  console.log(root);
+  console.log(secret);
 
+
+  const commitment = pederson.commit(root, secret);
+  console.log("commitment.....");
+  console.log(commitment);
+  const signedCommitmentFromContract = await contract.callStatic.getCommitment();
+  console.log("signed commitment from contract.....");
+  console.log(signedCommitmentFromContract);
+  const decryptedCommitment = signedCommitmentFromContract.map((c) =>
+      crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
+  );
+  console.log("Decrypted commitment from contract.....");
+  console.log(decryptedCommitment);
+  const result = pederson.verify(root, [decryptedCommitment], secret);
+  console.log("Result2........");
+  console.log(result);
+  const commitmentVerified = true;
+  // const commitmentVerified = decryptedCommitment[0] === commitment[0] && decryptedCommitment[1] === commitment[1]
   const leaf = SHA256("1000");
   const proof = tree.getProof(leaf);
   const isVerified = tree.verify(proof, leaf, root);
-  // perdersonCommit(root);
-  return isVerified;
+  return isVerified && commitmentVerified;
 };
 
 const check = function (hashCheck) {
@@ -121,15 +151,17 @@ async function main(params) {
   const commitmentUser = user(inputDoc);
   console.log("Commitment:");
   await certifier(commitmentUser);
-  // await transaction();
+  await transaction();
+  console.log("Zero knowledge proof:");
+  const result = zeroKnowledgeProof(merkleHash(inputDoc));
+  console.log(result);
+  console.log("Merkle tree proof:");
+  console.log(await generateProofMerkleTree(inputDoc));
 
-  // const result = zeroKnowledgeProof(merkleHash(inputDoc));
-  // console.log(generateProofMerkleTree(inputDoc));
-  // console.log(result);
 
-  // hrend = process.hrtime(hrstart)
+  hrend = process.hrtime(hrstart)
 
-  // console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+  console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
 }
 
 main();
