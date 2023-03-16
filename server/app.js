@@ -94,6 +94,8 @@ const zeroKnowledgeProof = (hash) => {
   let isCheck = true;
   const smallerParts = hash.match(/.{1,2}/g).map((e) => Number("0x" + e));
   smallerParts.forEach((hashPart) => {
+    // console.log(hashPart);
+    console.log(check(hashPart));
     if (!check(hashPart)) {
       isCheck = false;
       return;
@@ -103,10 +105,16 @@ const zeroKnowledgeProof = (hash) => {
   else return false;
 };
 
-//const commitmentUser = user(inputDoc);
-// console.log("Commitment:");
+var hrstart = process.hrtime()
+
+const commitmentUser = user(inputDoc);
+console.log("Commitment:");
 // console.log(commitmentUser);
-//console.log(generateProofMerkleTree(inputDoc));
-//certifier(commitmentUser);
+console.log(generateProofMerkleTree(inputDoc));
+certifier(commitmentUser);
 const result = zeroKnowledgeProof(merkleHash(inputDoc));
 console.log(result);
+
+hrend = process.hrtime(hrstart)
+
+console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)

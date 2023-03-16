@@ -19,16 +19,6 @@ contract Req {
     greeting = _greeting;
   }
 
-  function greet() public view returns (string memory) {
-    return greeting;
-  }
-
-  function setGreeting(string memory _greeting) public payable onlyOwner {
-    require(msg.value > 10000, "Not enough paid");
-    console.log("Changing greeting from '%s' to '%s'", greeting, _greeting);
-    greeting = _greeting;
-  }
-
   function getOwner() public view returns (address) {
     return _owner;
   }
