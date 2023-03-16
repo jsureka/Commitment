@@ -26,10 +26,10 @@ const secret = pederson.newSecret();
 
 
 const contract = new ethers.Contract(contractAddress, abi, signer);
-const inputDoc = ["Balance", "of", "X", "is", "1000"];
+const inputDoc = ["Balance", "of", "X", "is", "1001"];
 
-const transaction = async () => {
-  const a = await contract.callStatic.requirementFunction(1000);
+const transaction = async (input) => {
+  const a = await contract.callStatic.requirementFunction(input);
   console.log(a);
 };
 let g = crypto.randomInt(1000),
@@ -151,7 +151,7 @@ async function main(params) {
   const commitmentUser = user(inputDoc);
   console.log("Commitment:");
   await certifier(commitmentUser);
-  await transaction();
+  await transaction(parseInt(inputDoc[4]));
   console.log("Zero knowledge proof:");
   const result = zeroKnowledgeProof(merkleHash(inputDoc));
   console.log(result);
