@@ -1,18 +1,29 @@
-const hcrypt = require("node-hcrypt");
+const crypto = require("crypto");
 
-// Define the string to hash
-const str = "Hello World!";
+// Original data (an array of numbers)
+const data = [1, 2, 3, 4, 5];
+const input = 3;
+// Hash function
+function hash(value) {
+  return crypto.createHash("sha256").update(value.toString()).digest("hex");
+}
 
-// Convert the string to an integer
-const num = parseInt(Buffer.from(str).toString("hex"), 16);
+// Homomorphic hash of the original data
+const homomorphicHash = data.map(hash);
 
-// Perform homomorphic hashing operations
-const sum = hcrypt.add(num, 5);
-const product = hcrypt.mul(num, 10);
+// Remove an item from the original data (for example, the number 3)
+const indexToRemove = data.indexOf(input);
+if (indexToRemove !== -1) {
+  data.splice(indexToRemove, 1);
+}
 
-// Convert the result back to a string
-const sumStr = Buffer.from(sum.toString(16), "hex").toString();
-const productStr = Buffer.from(product.toString(16), "hex").toString();
+// Homomorphic hash of the updated data (without revealing the original data)
+const updatedHomomorphicHash = homomorphicHash.filter(
+  (_, index) => index !== indexToRemove
+);
 
-console.log(`Sum: ${sumStr}`);
-console.log(`Product: ${productStr}`);
+console.log(data); // Output: [1, 2, 4, 5]
+console.log(homomorphicHash); // h(x) -> from blockchain
+
+console.log(hash(input)); // h(input) -> shared by user
+console.log(updatedHomomorphicHash); // h(x/input) ) -> shared by user

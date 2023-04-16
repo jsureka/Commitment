@@ -24,14 +24,14 @@ const signer = new ethers.Wallet(
 );
 const secret = pederson.newSecret();
 
-
 const contract = new ethers.Contract(contractAddress, abi, signer);
 const inputDoc = ["Balance", "of", "X", "is", "1001"];
-
+const input = "1001";
 const transaction = async (input) => {
   const a = await contract.callStatic.requirementFunction(input);
   console.log(a);
 };
+
 let g = crypto.randomInt(1000),
   h = crypto.randomInt(1000),
   v = 6,
@@ -44,6 +44,30 @@ const merkleHash = (inputDoc) => {
   return root;
 };
 
+function h_hash(value) {
+  return crypto.createHash("sha256").update(value.toString()).digest("hex");
+}
+
+const homomorphicHash = (inputDoc) => {
+  const hash_x = inputDoc.map(h_hash);
+  return crypto.createHash("sha256").update(hash_x.join(",")).digest("hex");
+};
+
+function stringToNumber(str) {
+  const hash = crypto.createHash("sha256").update(str).digest();
+  const num = hash.readUIntBE(0, 6);
+  const remainder = num % 101;
+  return remainder;
+}
+const homomorphicHide = (inputDoc) => {
+  const data = inputDoc.map(stringToNumber);
+  const gToThePowerX = data.map((x) => g ** x % 101);
+  return crypto
+    .createHash("sha256")
+    .update(gToThePowerX.join(","))
+    .digest("hex");
+};
+
 const perdersonCommit = (hash) => {
   console.log("Hash......");
   console.log(hash);
@@ -51,7 +75,6 @@ const perdersonCommit = (hash) => {
 
   const commitment = pederson.commit(hash, secret);
 
- 
   const result = pederson.verify(hash, [commitment], secret);
   console.log("Result........");
   console.log(result);
@@ -62,6 +85,18 @@ const perdersonCommit = (hash) => {
 const user = (inputDoc) => {
   const hashRoot = merkleHash(inputDoc);
   const commitment = perdersonCommit(hashRoot);
+  return commitment;
+};
+
+const user_h_hash = (inputDoc) => {
+  const h_hash = homomorphicHash(inputDoc);
+  const commitment = perdersonCommit(h_hash);
+  return commitment;
+};
+
+const user_h_hide = (inputDoc) => {
+  const h_hide = homomorphicHide(inputDoc);
+  const commitment = perdersonCommit(h_hide);
   return commitment;
 };
 
@@ -97,15 +132,15 @@ const generateProofMerkleTree = async (inputDoc) => {
   console.log(root);
   console.log(secret);
 
-
   const commitment = pederson.commit(root, secret);
   console.log("commitment.....");
   console.log(commitment);
-  const signedCommitmentFromContract = await contract.callStatic.getCommitment();
+  const signedCommitmentFromContract =
+    await contract.callStatic.getCommitment();
   console.log("signed commitment from contract.....");
   console.log(signedCommitmentFromContract);
   const decryptedCommitment = signedCommitmentFromContract.map((c) =>
-      crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
+    crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
   );
   console.log("Decrypted commitment from contract.....");
   console.log(decryptedCommitment);
@@ -147,9 +182,10 @@ const zeroKnowledgeProof = (hash) => {
   return isCheck;
 };
 
-async function main(params) {
+async function usingMerkleTree() {
   const commitmentUser = user(inputDoc);
-  console.log("Commitment:");
+  // const commitUser_h_hash = user_h_hash(inputDoc);
+  console.log("Commitment h_hash:", commitmentUser);
   await certifier(commitmentUser);
   await transaction(parseInt(inputDoc[4]));
   console.log("Zero knowledge proof:");
@@ -158,10 +194,120 @@ async function main(params) {
   console.log("Merkle tree proof:");
   console.log(await generateProofMerkleTree(inputDoc));
 
+  hrend = process.hrtime(hrstart);
 
-  hrend = process.hrtime(hrstart)
+  console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+}
 
-  console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+async function homomorphicHashProof(inputDoc) {
+  const h_hashOfx = homomorphicHash(inputDoc).toString();
+  const commitment = perdersonCommit(h_hashOfx);
+  console.log("commitment.....");
+  console.log(commitment);
+  const signedCommitmentFromContract =
+    await contract.callStatic.getCommitment();
+  console.log("signed commitment from contract.....");
+  console.log(signedCommitmentFromContract);
+  const decryptedCommitment = signedCommitmentFromContract.map((c) =>
+    crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
+  );
+  console.log("Decrypted commitment from contract.....");
+  console.log(decryptedCommitment);
+  const result = pederson.verify(h_hashOfx, [decryptedCommitment], secret);
+  console.log("Result2........");
+  console.log(result);
+  const indexToRemove = inputDoc.indexOf(input);
+  if (indexToRemove !== -1) {
+    inputDoc.splice(indexToRemove, 1);
+  }
+  const updatedHomomorphicHash = inputDoc.map(h_hash);
+  console.log("Hash of x:", h_hashOfx); // h(x) -> from blockchain
+  const hashOfInput = h_hash(input);
+  console.log("hash of input", hashOfInput); // h(input) -> shared by user
+  console.log("update homomorphic hash", updatedHomomorphicHash); // h(x/input) ) -> shared by user
+  updatedHomomorphicHash.push(hashOfInput);
+  const checkupdatedHomomorphicHash = crypto
+    .createHash("sha256")
+    .update(updatedHomomorphicHash.join(","))
+    .digest("hex")
+    .toString();
+  return h_hashOfx === checkupdatedHomomorphicHash;
+}
+
+async function homomorphicHideProof(inputDoc) {
+  const h_hideOfx = homomorphicHide(inputDoc).toString();
+  const commitment = perdersonCommit(h_hideOfx);
+  console.log("commitment.....");
+  console.log(commitment);
+  const signedCommitmentFromContract =
+    await contract.callStatic.getCommitment();
+  console.log("signed commitment from contract.....");
+  console.log(signedCommitmentFromContract);
+  const decryptedCommitment = signedCommitmentFromContract.map((c) =>
+    crypto.publicDecrypt(publicKey, Buffer.from(c, "base64")).toString()
+  );
+  console.log("Decrypted commitment from contract.....");
+  console.log(decryptedCommitment);
+  const result = pederson.verify(h_hideOfx, [decryptedCommitment], secret);
+  console.log("Result2........");
+  console.log(result);
+  const indexToRemove = inputDoc.indexOf(input);
+  if (indexToRemove !== -1) {
+    inputDoc.splice(indexToRemove, 1);
+  }
+  const updatedHomomorphicHide = inputDoc.map(stringToNumber);
+  const gToThePowerXslashInput = updatedHomomorphicHide.map(
+    (x) => g ** x % 101
+  ); // shared by user
+  console.log("Hash of x:", h_hideOfx); // h(x) -> from blockchain
+  const gToThePowerInput = g ** stringToNumber(input) % 101; // shared by user
+
+  console.log("hash of input", gToThePowerInput); // h(input) -> shared by user
+  console.log("update homomorphic hash", gToThePowerXslashInput); // h(x/input) ) -> shared by user
+  gToThePowerXslashInput.push(gToThePowerInput);
+  const checkupdatedHomomorphicHash = crypto
+    .createHash("sha256")
+    .update(gToThePowerXslashInput.join(","))
+    .digest("hex")
+    .toString();
+  return h_hideOfx === checkupdatedHomomorphicHash;
+}
+async function usingHomomorphicHash() {
+  const commitmentUser = user_h_hash(inputDoc);
+  console.log("Commitment h_hash:", commitmentUser);
+  await certifier(commitmentUser);
+  await transaction(parseInt(inputDoc[4]));
+  console.log("Zero knowledge proof:");
+  const result = zeroKnowledgeProof(user_h_hash(inputDoc).toString());
+  console.log(result);
+  console.log("Homomorphic Hash proof:");
+  console.log(await homomorphicHashProof(inputDoc));
+
+  // hrend = process.hrtime(hrstart);
+
+  // console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+}
+
+async function usingHomomorphicHiding() {
+  const commitmentUser = user_h_hide(inputDoc);
+  console.log("Commitment h_hide:", commitmentUser);
+  await certifier(commitmentUser);
+  await transaction(parseInt(inputDoc[4]));
+  console.log("Zero knowledge proof:");
+  const result = zeroKnowledgeProof(user_h_hide(inputDoc).toString());
+  console.log(result);
+  console.log("Homomorphic Hash proof:");
+  console.log(await homomorphicHideProof(inputDoc));
+
+  // hrend = process.hrtime(hrstart);
+
+  // console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+}
+
+async function main(params) {
+  //usingMerkleTree();
+  //usingHomomorphicHash();
+  usingHomomorphicHiding();
 }
 
 main();
