@@ -32,8 +32,8 @@ const transaction = async (input) => {
   console.log(a);
 };
 
-let g = crypto.randomInt(1000),
-  h = crypto.randomInt(1000),
+let g = crypto.randomInt(100),
+  h = crypto.randomInt(100),
   v = 6,
   x = 0xffffff;
 
@@ -149,7 +149,7 @@ const generateProofMerkleTree = async (inputDoc) => {
   console.log(result);
   const commitmentVerified = true;
   // const commitmentVerified = decryptedCommitment[0] === commitment[0] && decryptedCommitment[1] === commitment[1]
-  const leaf = SHA256("1000");
+  const leaf = SHA256("1001");
   const proof = tree.getProof(leaf);
   const isVerified = tree.verify(proof, leaf, root);
   return isVerified && commitmentVerified;
@@ -189,8 +189,8 @@ async function usingMerkleTree() {
   await certifier(commitmentUser);
   await transaction(parseInt(inputDoc[4]));
   console.log("Zero knowledge proof:");
-  const result = zeroKnowledgeProof(merkleHash(inputDoc));
-  console.log(result);
+  const result = await zeroKnowledgeProof(merkleHash(inputDoc));
+  console.log("ZKP", result);
   console.log("Merkle tree proof:");
   console.log(await generateProofMerkleTree(inputDoc));
 
@@ -278,8 +278,8 @@ async function usingHomomorphicHash() {
   await certifier(commitmentUser);
   await transaction(parseInt(inputDoc[4]));
   console.log("Zero knowledge proof:");
-  const result = zeroKnowledgeProof(user_h_hash(inputDoc).toString());
-  console.log(result);
+  const result = await zeroKnowledgeProof(homomorphicHash(inputDoc).toString());
+  console.log("ZKP", result);
   console.log("Homomorphic Hash proof:");
   console.log(await homomorphicHashProof(inputDoc));
 
@@ -294,7 +294,7 @@ async function usingHomomorphicHiding() {
   await certifier(commitmentUser);
   await transaction(parseInt(inputDoc[4]));
   console.log("Zero knowledge proof:");
-  const result = zeroKnowledgeProof(user_h_hide(inputDoc).toString());
+  const result = zeroKnowledgeProof(homomorphicHide(inputDoc).toString());
   console.log(result);
   console.log("Homomorphic Hash proof:");
   console.log(await homomorphicHideProof(inputDoc));
@@ -306,8 +306,8 @@ async function usingHomomorphicHiding() {
 
 async function main(params) {
   //usingMerkleTree();
-  //usingHomomorphicHash();
-  usingHomomorphicHiding();
+  usingHomomorphicHash();
+  //usingHomomorphicHiding();
 }
 
 main();
