@@ -1,10 +1,12 @@
 const { ethers, providers } = require("ethers");
 require("dotenv").config();
+const fs = require('fs');
 const { abi } = require("../artifacts/contracts/Req.sol/Req.json");
 const { MerkleTree } = require("merkletreejs");
 const SHA256 = require("crypto-js/sha256");
 const crypto = require("crypto");
 const Pedersen = require("simple-js-pedersen-commitment");
+const regex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
 
 let hrstart = process.hrtime();
 const contractAddress = "0x42D9A54221aDAf22d01629F3D5f1E203cC124149";
@@ -183,6 +185,7 @@ const zeroKnowledgeProof = (hash) => {
 };
 
 async function usingMerkleTree() {
+  let hrstart = process.hrtime();
   const commitmentUser = user(inputDoc);
   // const commitUser_h_hash = user_h_hash(inputDoc);
   // console.log("Commitment h_hash:", commitmentUser);
@@ -305,6 +308,23 @@ async function usingHomomorphicHiding() {
 }
 
 async function main(params) {
+  const data200 = fs.readFileSync('./data/200.txt',
+            {encoding:'utf8', flag:'r'});
+  let res200 = data200.replace(regex, '').split(" ");
+  res200 = [...inputDoc, ...res200]
+  console.log(res200.length);
+
+  const data400 = fs.readFileSync('./data/400.txt',
+            {encoding:'utf8', flag:'r'});
+  let res400 = data400.replace(regex, '').split(" ");
+  res400 = [...inputDoc, ...res400]
+  console.log(res400.length);
+
+  const data600 = fs.readFileSync('./data/600.txt',
+            {encoding:'utf8', flag:'r'});
+  let res600 = data600.replace(regex, '').split(" ");
+  res600 = [...inputDoc, ...res600]
+  console.log(res600.length);
   // usingMerkleTree();
   // usingHomomorphicHash();
   //usingHomomorphicHiding();
