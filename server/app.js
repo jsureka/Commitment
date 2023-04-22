@@ -241,6 +241,8 @@ async function homomorphicHashProof(inputDoc) {
 }
 
 async function homomorphicHideProof(inputDoc) {
+  let hrstart = process.hrtime();
+
   const h_hideOfx = homomorphicHide(inputDoc).toString();
   const commitment = perdersonCommit(h_hideOfx);
   // console.log("commitment.....");
@@ -295,7 +297,8 @@ async function usingHomomorphicHash(inputDoc) {
   console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
 }
 
-async function usingHomomorphicHiding() {
+async function usingHomomorphicHiding(inputDoc) {
+  let hrstart = process.hrtime();
   const commitmentUser = user_h_hide(inputDoc);
   // console.log("Commitment h_hide:", commitmentUser);
   await certifier(commitmentUser);
@@ -306,9 +309,9 @@ async function usingHomomorphicHiding() {
   // console.log("Homomorphic Hash proof:");
   // console.log(await homomorphicHideProof(inputDoc));
 
-  // hrend = process.hrtime(hrstart);
+  hrend = process.hrtime(hrstart);
 
-  // console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+  console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
 }
 
 async function main(params) {
@@ -336,16 +339,18 @@ async function main(params) {
   // res800 = [...inputDoc, ...res800]
   // console.log(res800.length);
 
-  const data1000 = fs.readFileSync('./data/1000.txt',
-            {encoding:'utf8', flag:'r'});
-  let res1000 = data1000.replace(regex, '').split(" ");
-  res1000 = [...inputDoc, ...res1000]
-  console.log(res1000.length);
+  // const data1000 = fs.readFileSync('./data/1000.txt',
+  //           {encoding:'utf8', flag:'r'});
+  // let res1000 = data1000.replace(regex, '').split(" ");
+  // res1000 = [...inputDoc, ...res1000]
+  // console.log(res1000.length);
 
 
-  // usingMerkleTree(res1000);
-  usingHomomorphicHash(res1000);
-  //usingHomomorphicHiding();
+  await usingMerkleTree(inputDoc);
+ 
+  // usingHomomorphicHash(inputDoc);
+  // usingHomomorphicHiding(inputDoc);
+
 }
 
 main();

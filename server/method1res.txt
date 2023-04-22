@@ -1,4 +1,4 @@
-wordCount,smartContractTime,nonSCPartTime,totalTime
+wordCount,smartContractTime,nonSCPartTime,totalTime,storage
 5,12527.786583,739.379458,13267.166041
 205,16785.451083,716,17502.136292
 405,25549.110458,751.436708,26300.547166
