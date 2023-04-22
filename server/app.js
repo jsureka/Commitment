@@ -339,17 +339,19 @@ async function main(params) {
   // res800 = [...inputDoc, ...res800]
   // console.log(res800.length);
 
-  // const data1000 = fs.readFileSync('./data/1000.txt',
-  //           {encoding:'utf8', flag:'r'});
-  // let res1000 = data1000.replace(regex, '').split(" ");
-  // res1000 = [...inputDoc, ...res1000]
-  // console.log(res1000.length);
+  const data1000 = fs.readFileSync('./data/1000.txt',
+            {encoding:'utf8', flag:'r'});
+  let res1000 = data1000.replace(regex, '').split(" ");
+  res1000 = [...inputDoc, ...res1000]
+  console.log(res1000.length);
 
 
-  await usingMerkleTree(inputDoc);
- 
-  // usingHomomorphicHash(inputDoc);
-  // usingHomomorphicHiding(inputDoc);
+  // await usingMerkleTree(res1000);
+
+  // await usingHomomorphicHash(res1000);
+  await usingHomomorphicHiding(res1000);
+  const used = process.memoryUsage().heapUsed / 1024 / 1024;
+  console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`);
 
 }
 
