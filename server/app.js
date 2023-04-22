@@ -330,21 +330,21 @@ async function main(params) {
   // res600 = [...inputDoc, ...res600]
   // console.log(res600.length);
 
-  const data800 = fs.readFileSync('./data/800.txt',
-            {encoding:'utf8', flag:'r'});
-  let res800 = data800.replace(regex, '').split(" ");
-  res800 = [...inputDoc, ...res800]
-  console.log(res800.length);
+  // const data800 = fs.readFileSync('./data/800.txt',
+  //           {encoding:'utf8', flag:'r'});
+  // let res800 = data800.replace(regex, '').split(" ");
+  // res800 = [...inputDoc, ...res800]
+  // console.log(res800.length);
 
   const data1000 = fs.readFileSync('./data/1000.txt',
             {encoding:'utf8', flag:'r'});
   let res1000 = data1000.replace(regex, '').split(" ");
-  res800 = [...inputDoc, ...res1000]
+  res1000 = [...inputDoc, ...res1000]
   console.log(res1000.length);
 
 
 
-  // usingMerkleTree(res400);
+  usingMerkleTree(res1000);
   // usingHomomorphicHash();
   //usingHomomorphicHiding();
 }
