@@ -312,27 +312,39 @@ async function usingHomomorphicHiding() {
 }
 
 async function main(params) {
-  const data200 = fs.readFileSync('./data/200.txt',
+  // const data200 = fs.readFileSync('./data/200.txt',
+  //           {encoding:'utf8', flag:'r'});
+  // let res200 = data200.replace(regex, '').split(" ");
+  // res200 = [...inputDoc, ...res200]
+  // console.log(res200.length);
+
+  // const data400 = fs.readFileSync('./data/400.txt',
+  //           {encoding:'utf8', flag:'r'});
+  // let res400 = data400.replace(regex, '').split(" ");
+  // res400 = [...inputDoc, ...res400]
+  // console.log(res400.length);
+
+  // const data600 = fs.readFileSync('./data/600.txt',
+  //           {encoding:'utf8', flag:'r'});
+  // let res600 = data600.replace(regex, '').split(" ");
+  // res600 = [...inputDoc, ...res600]
+  // console.log(res600.length);
+
+  const data800 = fs.readFileSync('./data/800.txt',
             {encoding:'utf8', flag:'r'});
-  let res200 = data200.replace(regex, '').split(" ");
-  res200 = [...inputDoc, ...res200]
-  console.log(res200.length);
+  let res800 = data800.replace(regex, '').split(" ");
+  res800 = [...inputDoc, ...res800]
+  console.log(res800.length);
 
-  const data400 = fs.readFileSync('./data/400.txt',
+  const data1000 = fs.readFileSync('./data/1000.txt',
             {encoding:'utf8', flag:'r'});
-  let res400 = data400.replace(regex, '').split(" ");
-  res400 = [...inputDoc, ...res400]
-  console.log(res400.length);
-
-  const data600 = fs.readFileSync('./data/600.txt',
-            {encoding:'utf8', flag:'r'});
-  let res600 = data600.replace(regex, '').split(" ");
-  res600 = [...inputDoc, ...res600]
-  console.log(res600.length);
+  let res1000 = data1000.replace(regex, '').split(" ");
+  res800 = [...inputDoc, ...res1000]
+  console.log(res1000.length);
 
 
 
-  usingMerkleTree(res400);
+  // usingMerkleTree(res400);
   // usingHomomorphicHash();
   //usingHomomorphicHiding();
 }
