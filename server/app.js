@@ -305,7 +305,7 @@ async function usingHomomorphicHiding() {
 }
 
 async function main(params) {
-  usingMerkleTree();
+  // usingMerkleTree();
   // usingHomomorphicHash();
   //usingHomomorphicHiding();
 }
