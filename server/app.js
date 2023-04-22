@@ -8,7 +8,6 @@ const crypto = require("crypto");
 const Pedersen = require("simple-js-pedersen-commitment");
 const regex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
 
-let hrstart = process.hrtime();
 const contractAddress = "0x42D9A54221aDAf22d01629F3D5f1E203cC124149";
 let pederson = new Pedersen(
   "925f15d93a513b441a78826069b4580e3ee37fc5",
@@ -279,20 +278,21 @@ async function homomorphicHideProof(inputDoc) {
     .toString();
   return h_hideOfx === checkupdatedHomomorphicHash;
 }
-async function usingHomomorphicHash() {
+async function usingHomomorphicHash(inputDoc) {
+  let hrstart = process.hrtime();
   const commitmentUser = user_h_hash(inputDoc);
   // console.log("Commitment h_hash:", commitmentUser);
   await certifier(commitmentUser);
   await transaction(parseInt(inputDoc[4]));
   // console.log("Zero knowledge proof:");
   const result = await zeroKnowledgeProof(homomorphicHash(inputDoc).toString());
-  // console.log("ZKP", result);
+  console.log("ZKP", result);
   // console.log("Homomorphic Hash proof:");
   // console.log(await homomorphicHashProof(inputDoc));
 
-  // hrend = process.hrtime(hrstart);
+  hrend = process.hrtime(hrstart);
 
-  // console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+  console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
 }
 
 async function usingHomomorphicHiding() {
@@ -343,9 +343,8 @@ async function main(params) {
   console.log(res1000.length);
 
 
-
-  usingMerkleTree(res1000);
-  // usingHomomorphicHash();
+  // usingMerkleTree(res1000);
+  usingHomomorphicHash(res1000);
   //usingHomomorphicHiding();
 }
 
