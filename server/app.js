@@ -119,8 +119,12 @@ const certifier = async (commitmentUser) => {
 
   // console.log("After decrypting......");
   // console.log(commitmentUser);
+  let startTime = process.hrtime();
   const tx = await contract.setCommitment(commitmentUser);
   const receipt = await tx.wait();
+  hrend = process.hrtime(startTime);
+
+  console.info("Execution time for smart contract call (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
   // console.log(receipt);
   // console.log("receipt done...");
 };
@@ -184,7 +188,7 @@ const zeroKnowledgeProof = (hash) => {
   return isCheck;
 };
 
-async function usingMerkleTree() {
+async function usingMerkleTree(inputDoc) {
   let hrstart = process.hrtime();
   const commitmentUser = user(inputDoc);
   // const commitUser_h_hash = user_h_hash(inputDoc);
@@ -199,7 +203,7 @@ async function usingMerkleTree() {
 
   hrend = process.hrtime(hrstart);
 
-  console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
+  console.info("Execution time for entire procedure (hr): %ds %dms", hrend[0], hrend[1] / 1000000);
 }
 
 async function homomorphicHashProof(inputDoc) {
@@ -325,7 +329,10 @@ async function main(params) {
   let res600 = data600.replace(regex, '').split(" ");
   res600 = [...inputDoc, ...res600]
   console.log(res600.length);
-  // usingMerkleTree();
+
+
+
+  usingMerkleTree(res400);
   // usingHomomorphicHash();
   //usingHomomorphicHiding();
 }
