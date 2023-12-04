@@ -1,9 +1,8 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-import "@nomiclabs/hardhat-solhint";
-import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-solhint";
 import "@nomiclabs/hardhat-waffle";
+import "@typechain/hardhat";
+import { HardhatUserConfig } from "hardhat/config";
 const dotenv = require("dotenv");
 const path = require("path");
 
@@ -18,6 +17,7 @@ const chainIds = {
   ropsten: 3,
   bsctest: 97,
   bscmain: 56,
+  sepolia: 11155111,
 };
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -25,7 +25,7 @@ const API_KEY = process.env.RPC_NODE_API_KEY;
 const MNEMONIC = process.env.MNEMONIC;
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY as string;
 
-const defaultRPCNodeProvider = "alchemy";
+const defaultRPCNodeProvider = "sepolia";
 
 const getRPCURL = (network: string, RPCNodeProvider: string) => {
   switch (RPCNodeProvider) {
@@ -41,6 +41,8 @@ const getRPCURL = (network: string, RPCNodeProvider: string) => {
     case "datahub":
       return `https://ethereum-${network}--rpc.datahub.figment.io//apikey/${API_KEY}`;
 
+    case "sepolia":
+      return `https://eth-sepolia.g.alchemy.com/v2/${API_KEY}`;
     default:
       console.error("Unknown provider:", RPCNodeProvider);
   }
@@ -75,6 +77,11 @@ const config: HardhatUserConfig = {
       url: getRPCURL("goerli", defaultRPCNodeProvider),
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: chainIds.goerli,
+    },
+    sepolia: {
+      url: getRPCURL("sepolia", defaultRPCNodeProvider),
+      accounts: [`0x${PRIVATE_KEY}`],
+      chainId: chainIds.sepolia,
     },
     mainnet: {
       url: getRPCURL("mainnet", defaultRPCNodeProvider),

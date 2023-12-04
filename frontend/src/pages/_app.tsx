@@ -1,18 +1,19 @@
-import 'styles/style.scss'
-import type { AppProps } from 'next/app'
-import { ThemeProvider } from 'next-themes'
-import { useRouter } from 'next/router'
 import HeadGlobal from 'components/HeadGlobal'
+import { ThemeProvider } from 'next-themes'
+import type { AppProps } from 'next/app'
+import { useRouter } from 'next/router'
+import 'styles/style.scss'
 // Web3Wrapper deps:
-import { getDefaultWallets, RainbowKitProvider, lightTheme, darkTheme } from '@rainbow-me/rainbowkit'
-import { Chain } from '@rainbow-me/rainbowkit'
-import { chain, createClient, configureChains, WagmiConfig } from 'wagmi'
-import { infuraProvider } from 'wagmi/providers/infura'
-import { publicProvider } from 'wagmi/providers/public'
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
-import { useTheme } from 'next-themes'
+import { Chain, RainbowKitProvider, darkTheme, getDefaultWallets, lightTheme } from '@rainbow-me/rainbowkit'
 import { app } from 'appConfig'
-import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import 'react-toastify/dist/ReactToastify.css'
+import { WagmiConfig, chain, configureChains, createClient } from 'wagmi'
+import { infuraProvider } from 'wagmi/providers/infura'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
+import { publicProvider } from 'wagmi/providers/public'
+import { ToastContainer } from 'react-toastify'
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -20,6 +21,18 @@ function App({ Component, pageProps }: AppProps) {
     <ThemeProvider defaultTheme="system" attribute="class">
       <HeadGlobal />
       <Web3Wrapper>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         <Component key={router.asPath} {...pageProps} />
       </Web3Wrapper>
     </ThemeProvider>
@@ -48,14 +61,44 @@ const gnosisChain: Chain = {
   testnet: true,
 }
 
+const sepoliaChain: Chain = {
+  id: 11155111,
+  name: 'Sepolia',
+  network: 'sepolia',
+  iconUrl:
+    'https://assets-global.website-files.com/5f973c97cf5aea614f93a26c/6449630da0da61343b5adba1_ethereum-logo.png',
+  iconBackground: '#000',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'eth',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: 'https://rpc.sepolia.org',
+  },
+  blockExplorers: {
+    default: { name: 'Etherscan', url: 'https://sepolia.etherscan.io' },
+  },
+  testnet: true,
+}
+
 // Web3 Configs
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, gnosisChain, chain.rinkeby, chain.ropsten],
+  [
+    chain.mainnet,
+    chain.polygon,
+    chain.optimism,
+    chain.arbitrum,
+    gnosisChain,
+    chain.rinkeby,
+    chain.ropsten,
+    sepoliaChain,
+  ],
   [
     infuraProvider({ infuraId: process.env.NEXT_PUBLIC_INFURA_ID !== '' && process.env.NEXT_PUBLIC_INFURA_ID }),
     jsonRpcProvider({
       rpc: chain => {
-        if (chain.id !== gnosisChain.id) return null
+        if (chain.id !== gnosisChain.id && chain.id !== sepoliaChain.id) return null
         return { http: chain.rpcUrls.default }
       },
     }),

@@ -1,20 +1,20 @@
-import { ethers } from "hardhat";
 import { writeFile } from "fs/promises";
+import { ethers } from "hardhat";
 
 async function main() {
   // const lockedAmount = ethers.utils.parseEther("1");
 
-  const Greeter = await ethers.getContractFactory("Req");
+  const SupplyChain = await ethers.getContractFactory("Req");
   // const greeting = await Greeting.deploy("Hello world", { value: lockedAmount });
-  const greeter = await Greeter.deploy("Hello, world!");
+  const supplyChain = await SupplyChain.deploy("hello world");
 
-  await greeter.deployed();
+  await supplyChain.deployed();
 
-  console.log("Greeting contract deployed to: ", greeter.address);
+  console.log("Greeting contract deployed to: ", supplyChain.address);
   // write
   await writeFile(
     "./frontend/src/info/data.json",
-    JSON.stringify({ contractAddress: greeter.address })
+    JSON.stringify({ contractAddress: supplyChain.address })
   );
 }
 

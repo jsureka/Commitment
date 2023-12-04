@@ -1,11 +1,10 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { ethers, waffle} from 'hardhat';
-import GreeterArtifact from '../artifacts/contracts/Greeter.sol/Greeter.json';
-import {Greeter} from '../frontend/src/typechain/Greeter';
+import { ethers, waffle } from "hardhat";
+import GreeterArtifact from "../artifacts/contracts/Greeter.sol/Greeter.json";
+import { Greeter } from "../frontend/src/typechain/Greeter";
 
-const {deployContract} = waffle;
+const { deployContract } = waffle;
 
 describe("Greeter tests", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -16,7 +15,9 @@ describe("Greeter tests", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, ...otherAccounts] = await ethers.getSigners();
 
-    greeter = (await deployContract(owner, GreeterArtifact, ['Hello, world!'])) as Greeter;
+    greeter = (await deployContract(owner, GreeterArtifact, [
+      "Hello, world!",
+    ])) as Greeter;
 
     return { greeter, owner, otherAccounts };
   }
@@ -24,7 +25,7 @@ describe("Greeter tests", function () {
   describe("Test suite", function () {
     it("Check if intiated with hello world", async function () {
       const { greeter } = await loadFixture(deployOnceFixture);
-      
+
       expect(await greeter.greet()).to.be.eq("Hello, world!");
     });
 
@@ -36,13 +37,12 @@ describe("Greeter tests", function () {
     });
 
     it("Check if not owner cant change greet", async function () {
-      const { greeter, owner, otherAccounts } = await loadFixture(deployOnceFixture);
-      await expect(greeter.connect(otherAccounts[0]).setGreeting("Hello, universe!")).to.be.reverted;
+      const { greeter, owner, otherAccounts } = await loadFixture(
+        deployOnceFixture
+      );
+      await expect(
+        greeter.connect(otherAccounts[0]).setGreeting("Hello, universe!")
+      ).to.be.reverted;
     });
-
-
-
   });
-
- 
 });
