@@ -1,4 +1,4 @@
-export default function StepTwo() {
+export default function StepTwo({data}) {
   return (
     <div className="bg-new-gray w-full text-center ">
       <div className="relative mx-auto my-4 h-20 w-20">
@@ -18,7 +18,7 @@ export default function StepTwo() {
         </svg>
       </div>
       <h1 className="mb-4 text-xl font-semibold">Total Challenges</h1>
-      <h3 className="text-primary text-6xl font-light">0</h3>
+      <h3 className="text-primary text-6xl font-light">{data}</h3>
     </div>
   )
 }

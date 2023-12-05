@@ -26,7 +26,7 @@ function Create() {
     let tx = await contract.createChallenge(challengeName, incentive, stepCount, {
       from: signer.getAddress(),
       gasLimit: 2000000,
-      value: 1001,
+      value: incentive * 1000000000000,
     })
     let reciept = await tx.wait()
     console.log(reciept)

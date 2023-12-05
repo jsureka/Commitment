@@ -76,9 +76,14 @@ function Verifier() {
         )}
         {isVerifier && (
           <div>
+                          <Link href="/create">
+                <button className="mb-3 rounded-lg bg-violet-800 p-4 text-xl font-bold text-white">
+                  Create a new challenge
+                </button>
+              </Link>
             {/* Create a new challenge */}
 
-            {challengeName !== '' ? (
+            {challengeName !== '' && (
               <div>
                 <h1 className="text-4xl font-bold">Current Challenge</h1>
                 <div className="border-new-gray my-8 border border-b-2" />
@@ -93,12 +98,6 @@ function Verifier() {
                   <h1 className="text-lg font-semibold">0</h1>
                 </div>
               </div>
-            ) : (
-              <Link href="/create">
-                <button className="mb-3 rounded-lg bg-violet-800 p-4 text-xl font-bold text-white">
-                  Create a new challenge
-                </button>
-              </Link>
             )}
             <h1 className="mt-5 pt-5 text-2xl font-bold">Verify Completed Challenges</h1>
             <div className="border-new-gray my-8 border border-b-2" />

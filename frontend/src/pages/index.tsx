@@ -61,9 +61,9 @@ export default function Home() {
               </h1>
               <h4 className="font-body my-6 text-2xl capitalize">Find Out How To Get Started</h4>
               <div className="my-12 grid grid-cols-3 grid-rows-1 gap-4">
-                <StepOne />
-                <StepTwo />
-                <StepThree />
+                <StepOne data={null} />
+                <StepTwo data={null} />
+                <StepThree data={null} />
               </div>
             </div>
           </div>
