@@ -2,9 +2,13 @@ import StepOne from 'components/HowItWorks/Step1'
 import StepTwo from 'components/HowItWorks/Step2'
 import StepThree from 'components/HowItWorks/Step3'
 import { format } from 'date-fns'
+import { ethers } from 'ethers'
 import NavbarHome from 'layouts/navbar'
 import { useEffect, useState } from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Req__factory } from 'typechain/factories/Req__factory'
+import { useAccount, useBalance } from 'wagmi'
+import datainfo from '../info/data.json'
 
 function Dashboard() {
   const isFetchingWorkouts = true
@@ -18,6 +22,12 @@ function Dashboard() {
     week: 0,
     month: 0,
   }
+  const { address, isConnected, connector } = useAccount()
+  const [txHash, setTxHash] = useState('')
+  let contract
+  const { data: balance, isLoading: isBalanceLoading } = useBalance({
+    addressOrName: address,
+  })
 
   const [calories, setCalories] = useState(initialData)
   const getStepCounts = () => {
@@ -26,7 +36,7 @@ function Dashboard() {
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-          'Bearer ya29.a0AfB_byBPYJH2G5J0RriZ6Lsf153BDQm5w-K8tVMPzfkVAVB4oQyuCPjwXXg2kt50z8DwyJrClAssUEBywv5-l4L_I-S4AHXT1m-vcCuCDJlt74Exg9SvCayc3z0qEO3P_R4JU42nzUIJcSzX7fbU49Gs1UHR2xmrEKYeaCgYKAZYSARMSFQHGX2Mi9hptGX53WWFWzp_4oki3sA0171',
+          'Bearer ya29.a0AfB_byA2OgDIme4eKMydHiXq1ZV6TOQ57WEoBtdSp7A9Bcz2EyY32abN0rhK7yxvv-aFE0UG5SsphLH5BBzd7Q_sE1Uq220N2FP08fpWD3X1BAMnMCi1ZvucLdrOgRqqETdUhE8_ieNQBAAGxRPOhf-Elcq7UtdDUtmUaCgYKAY8SARMSFQHGX2MiCF-x3sMw-MyLAIPtTFsC5w0171',
       },
       body: JSON.stringify({
         aggregateBy: [
@@ -56,16 +66,27 @@ function Dashboard() {
         setStepCountData(stepcounts)
         const totalSteps = stepcounts.reduce((acc, curr) => acc + curr.steps, 0)
         setTotalSteps(totalSteps)
+        if (isConnected) {
+          const provider = new ethers.providers.Web3Provider(window.ethereum)
+          const signer = provider.getSigner()
+          contract = Req__factory.connect(datainfo.contractAddress, signer)
+          contract
+            .requirementFunction(stepcounts[stepcounts.length - 1].steps ? stepcounts[stepcounts.length - 1].steps : 0)
+            .then(res => {
+              console.log(res)
+              console.log(stepcounts[stepcounts.length - 1].steps)
+            })
+        }
       })
       .catch(err => console.log(err))
   }
 
   useEffect(() => {
     getStepCounts()
-  }, []) // empty dependency array
+  }, [])
   return (
     <div className=" space-y-10">
-      <NavbarHome current={null} />
+      <NavbarHome current={'dashboard'} />
       <div className=" px-48">
         <div className=" grid grid-cols-3 grid-rows-1 gap-4">
           <StepOne data={totalSteps} />

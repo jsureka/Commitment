@@ -43,10 +43,7 @@ export default function Home() {
           </div>
           <div className="flex w-2/5 justify-center">
             <div className="max-w-5xl overflow-hidden rounded-lg shadow-lg ">
-              <img className="aspect-video w-full object-cover" src="/dashboard-nft.png" alt="The Cat" />
-              <div className="bg-new-gray px-6 py-4">
-                <div className="mb-2 text-lg">The Wool Cat</div>
-              </div>
+              <img className=" w-full object-cover" src="/dashboard-nft.jpg" alt="The Cat" />
             </div>
           </div>
         </div>

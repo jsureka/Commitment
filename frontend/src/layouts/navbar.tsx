@@ -28,7 +28,7 @@ export default function NavbarHome({ current }) {
             <div className="flex pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               <button type="button" className="mx-6 font-semibold">
                 {current === 'dashboard' ? (
-                  <h1 className="from-secondary-1 to-secondary-2 bg-gradient-to-br bg-clip-text text-transparent">
+                  <h1 className="from-secondary-1  bg-purple-400 text-white p-3 rounded-lg">
                     Dashboard
                   </h1>
                 ) : (
@@ -38,13 +38,11 @@ export default function NavbarHome({ current }) {
                 )}
               </button>
               <button type="button" className="mx-6 font-semibold">
-                {current === 'orders' ? (
-                  <h1 className="from-secondary-1 to-secondary-2 bg-gradient-to-br bg-clip-text text-transparent">
-                    Orders
-                  </h1>
+                {current === 'challenges' ? (
+                  <h1 className="from-secondary-1 bg-purple-400 text-white p-3 rounded-lg">Challenges</h1>
                 ) : (
                   <h1>
-                    <Link href="/orders">Orders</Link>
+                    <Link href="/challenges">Challenges</Link>
                   </h1>
                 )}
               </button>

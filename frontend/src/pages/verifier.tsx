@@ -49,6 +49,11 @@ function Verifier() {
         setChallengeName(res.challengeName)
         console.log(res)
       })
+
+      contract.getCompletionList().then(res => {
+        console.log(res)
+        
+      })
     }
   }, [isConnected, connector])
   return (
@@ -76,11 +81,11 @@ function Verifier() {
         )}
         {isVerifier && (
           <div>
-                          <Link href="/create">
-                <button className="mb-3 rounded-lg bg-violet-800 p-4 text-xl font-bold text-white">
-                  Create a new challenge
-                </button>
-              </Link>
+            <Link href="/create">
+              <button className="mb-3 rounded-lg bg-violet-800 p-4 text-xl font-bold text-white">
+                Create a new challenge
+              </button>
+            </Link>
             {/* Create a new challenge */}
 
             {challengeName !== '' && (
